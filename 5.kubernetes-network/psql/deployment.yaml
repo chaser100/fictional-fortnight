@@ -1,0 +1,38 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: psqldb
+  strategy:
+      type: Recreate
+  template:
+    metadata:
+      labels:
+        app: psqldb
+    spec:
+      containers:
+      - image: postgres:10.13
+        name: postgres
+        ports:
+        - containerPort: 55000
+        volumeMounts:
+        - name: psqldb
+          mountPath: /psqldb
+        env:
+          - name: POSTGRES_PASSWORD
+            value: testpassword
+          - name: POSTGRES_USER
+            value: testuser
+          - name: POSTGRES_DB
+            value: testdatabase
+          - name: PGDATA
+            value: /psqldb/var/lib/postgresql/data/pgdata
+      volumes:
+      - name: psqldb
+        persistentVolumeClaim:
+          claimName: psqldb
